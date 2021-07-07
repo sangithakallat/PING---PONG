@@ -64,5 +64,6 @@ function Ball:update(dt)
 end
 
 function Ball:render()
+    love.graphics.setColor(1, 0, 0)
     love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
 end
