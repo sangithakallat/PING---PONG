@@ -1,4 +1,3 @@
-
 push = require 'push'
 Class = require 'class'
 require 'Paddle'
@@ -18,18 +17,20 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle('Pong')
     math.randomseed(os.time())
-    smallFont = love.graphics.newFont('font.ttf', 8)
-    largeFont = love.graphics.newFont('font.ttf', 16)
+    smallFont = love.graphics.newFont('retro.ttf', 8)
+    fpsFont = love.graphics.newFont('retro.ttf', 8)
+    largeFont = love.graphics.newFont('retro.ttf', 16)
     scoreFont = love.graphics.newFont('font.ttf', 32)
+
     love.graphics.setFont(smallFont)
     sounds = {
-    	['paddle_hit'] = love.audio.newSource('sounds/ping.mp3', 'static' ),
-    	['score'] = love.audio.newSource('sounds/score.wav', 'static'),
-    	['wall_hit'] =  love.audio.newSource('sounds/bounce.mp3', 'static')
+        ['paddle_hit'] = love.audio.newSource('sounds/ping.mp3', 'static' ),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['wall_hit'] =  love.audio.newSource('sounds/bounce.mp3', 'static')
     }-- called either by sounds.score or sounds['score'] to execute sounds.score:play()
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
-        fullscreen = false,
-        resizable = true,
+        fullscreen = true,
+        resizable = false,
         vsync = true
     })
     player1Score = 0
@@ -37,11 +38,12 @@ function love.load()
 
     servingPlayer = 1
 
-    player1 = Paddle(10, 30, 5, 20)
-    player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
+    player1 = Paddle(10, 30, 5, 30)
+    player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 30)
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
     gameState = 'start'
+    love.graphics.setBackgroundColor(0, 1, 0)
 end
 
 function love.resize(w, h)
@@ -50,6 +52,7 @@ end
 
 function love.update(dt)
     if gameState == 'serve' then
+        love.graphics.setBackgroundColor(0, 1, 0)
         -- before switching to play, initialize ball's velocity based
         -- on player who last scored
         ball.dy = math.random(-50, 50)
@@ -59,6 +62,7 @@ function love.update(dt)
             ball.dx = -math.random(140, 200)
         end
     elseif gameState == 'play' then
+        love.graphics.setBackgroundColor(0, 1, 0)
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position of collision
         if ball:collides(player1) then
@@ -169,6 +173,7 @@ function love.keypressed(key)
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
     elseif key == 'enter' or key == 'return' then
+        love.graphics.setBackgroundColor(0, 1, 0)
         if gameState == 'start' then
             gameState = 'serve'
         elseif gameState == 'serve' then
@@ -200,20 +205,24 @@ function love.draw()
     displayScore()
 
     if gameState == 'start' then
+        love.graphics.setBackgroundColor(0, 1, 0)
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
+        love.graphics.setBackgroundColor(0, 1, 0)
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'play' then
+        love.graphics.setBackgroundColor(0, 1, 0)
 
     elseif gameState == 'done' then 
+        love.graphics.setBackgroundColor(1, 0, 0)
         love.graphics.setFont(largeFont)
         love.graphics.setColor(0, 1, 0)
-        love.graphics.printf('Player' .. tostring(winningPlayer) .. 'wins!!', 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Player --' .. tostring(winningPlayer) .. '--wins!!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press enter to restart', 0, 50, VIRTUAL_WIDTH, 'center')
     end
@@ -229,8 +238,7 @@ end
 
 function displayFPS()
     
-    love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.setFont(fpsFont)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
 
